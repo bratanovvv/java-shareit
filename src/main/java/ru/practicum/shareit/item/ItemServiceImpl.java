@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item;
 
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.utils.exception.impl.ForbiddenException;
 import ru.practicum.shareit.utils.exception.impl.NotFoundException;
 import ru.practicum.shareit.item.entity.model.Item;
@@ -14,17 +15,16 @@ import java.util.List;
 public class ItemServiceImpl implements ItemService {
 
 	private final ItemStorage itemStorage;
-	private final UserStorage userStorage;
+	private final UserService userService;
 
-	public ItemServiceImpl(ItemStorage itemStorage, UserStorage userStorage) {
+	public ItemServiceImpl(ItemStorage itemStorage, UserService userService) {
 		this.itemStorage = itemStorage;
-		this.userStorage = userStorage;
+		this.userService = userService;
 	}
 
 	@Override
 	public Item create(long userId, Item item) {
-		User owner = userStorage.findById(userId)
-				.orElseThrow(() -> new NotFoundException("User with id " + userId + " not found"));
+		User owner = userService.getById(userId);
 		item.setOwner(owner);
 		return itemStorage.save(item);
 	}

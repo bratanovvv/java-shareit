@@ -2,13 +2,12 @@ package ru.practicum.shareit.user.entity.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ru.practicum.shareit.utils.validation.Create;
-import ru.practicum.shareit.utils.validation.Update;
+import ru.practicum.shareit.utils.validation.group.Create;
+import ru.practicum.shareit.utils.validation.group.Update;
 
 @Getter
 @Setter

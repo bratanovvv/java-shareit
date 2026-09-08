@@ -1,14 +1,15 @@
 package ru.practicum.shareit.user.entity;
 
+import org.springframework.stereotype.Component;
 import ru.practicum.shareit.user.entity.dto.UserDto;
 import ru.practicum.shareit.user.entity.model.User;
+import ru.practicum.shareit.utils.mapper.Mapper;
 
-public final class UserMapper {
+@Component
+public final class UserMapper implements Mapper<User, UserDto> {
 
-	private UserMapper() {
-	}
-
-	public static UserDto toUserDto(User user) {
+	@Override
+	public UserDto toDto(User user) {
 		return new UserDto(
 				user.getId(),
 				user.getName(),
@@ -16,7 +17,8 @@ public final class UserMapper {
 		);
 	}
 
-	public static User toUser(UserDto userDto) {
+	@Override
+	public User toEntity(UserDto userDto) {
 		return new User(
 				userDto.getId(),
 				userDto.getName(),
