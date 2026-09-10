@@ -7,7 +7,6 @@ import ru.practicum.shareit.utils.exception.impl.NotFoundException;
 import ru.practicum.shareit.item.entity.model.Item;
 import ru.practicum.shareit.item.storage.ItemStorage;
 import ru.practicum.shareit.user.entity.model.User;
-import ru.practicum.shareit.user.storage.UserStorage;
 
 import java.util.List;
 
