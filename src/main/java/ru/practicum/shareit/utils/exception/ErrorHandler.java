@@ -11,12 +11,15 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
-import ru.practicum.shareit.utils.exception.impl.ConflictException;
-import ru.practicum.shareit.utils.exception.impl.ForbiddenException;
-import ru.practicum.shareit.utils.exception.impl.NotFoundException;
-import ru.practicum.shareit.utils.exception.impl.ValidationException;
+import ru.practicum.shareit.utils.exception.model.ErrorCode;
+import ru.practicum.shareit.utils.exception.model.ErrorResponse;
+import ru.practicum.shareit.utils.exception.errors.ShareitException;
+import ru.practicum.shareit.utils.exception.errors.impl.ConflictException;
+import ru.practicum.shareit.utils.exception.errors.impl.ForbiddenException;
+import ru.practicum.shareit.utils.exception.errors.impl.NotFoundException;
+import ru.practicum.shareit.utils.exception.errors.impl.ValidationException;
 
-import java.util.Map;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -24,74 +27,87 @@ import java.util.stream.Collectors;
 public class ErrorHandler {
 
 	@ExceptionHandler
-	public ResponseEntity<Map<String, String>> handleNotFound(NotFoundException exception) {
+	public ResponseEntity<ErrorResponse> handleNotFound(NotFoundException exception) {
 		log.warn("Entity not found: {}", exception.getMessage());
-		return buildResponse(HttpStatus.NOT_FOUND, exception.getMessage());
+		return buildResponse(HttpStatus.NOT_FOUND, ErrorCode.NOT_FOUND, exception.getMessage());
 	}
 
 	@ExceptionHandler
-	public ResponseEntity<Map<String, String>> handleConflict(ConflictException exception) {
+	public ResponseEntity<ErrorResponse> handleConflict(ConflictException exception) {
 		log.warn("Conflict: {}", exception.getMessage());
-		return buildResponse(HttpStatus.CONFLICT, exception.getMessage());
+		return buildResponse(HttpStatus.CONFLICT, ErrorCode.CONFLICT, exception.getMessage());
 	}
 
 	@ExceptionHandler
-	public ResponseEntity<Map<String, String>> handleForbidden(ForbiddenException exception) {
+	public ResponseEntity<ErrorResponse> handleForbidden(ForbiddenException exception) {
 		log.warn("Access denied: {}", exception.getMessage());
-		return buildResponse(HttpStatus.FORBIDDEN, exception.getMessage());
+		return buildResponse(HttpStatus.FORBIDDEN, ErrorCode.FORBIDDEN, exception.getMessage());
 	}
 
 	@ExceptionHandler
-	public ResponseEntity<Map<String, String>> handleValidation(ValidationException exception) {
+	public ResponseEntity<ErrorResponse> handleValidation(ValidationException exception) {
 		log.warn("Validation failed: {}", exception.getMessage());
-		return buildResponse(HttpStatus.BAD_REQUEST, exception.getMessage());
+		return buildResponse(HttpStatus.BAD_REQUEST, ErrorCode.VALIDATION_ERROR, exception.getMessage());
 	}
 
 	@ExceptionHandler
-	public ResponseEntity<Map<String, String>> handleMethodArgumentNotValid(MethodArgumentNotValidException exception) {
-		String message = exception.getBindingResult().getFieldErrors().stream()
-				.map(FieldError::getDefaultMessage)
-				.collect(Collectors.joining("; "));
-		log.warn("Request body validation failed: {}", message);
-		return buildResponse(HttpStatus.BAD_REQUEST, message);
+	public ResponseEntity<ErrorResponse> handleMethodArgumentNotValid(MethodArgumentNotValidException exception) {
+		List<String> details = exception.getBindingResult().getFieldErrors().stream()
+				.map(this::formatFieldError)
+				.collect(Collectors.toList());
+		log.warn("Request body validation failed: {}", details);
+		return buildResponse(HttpStatus.BAD_REQUEST, ErrorCode.VALIDATION_ERROR,
+				"Request body validation failed", details);
 	}
 
 	@ExceptionHandler
-	public ResponseEntity<Map<String, String>> handleBindingError(ServletRequestBindingException exception) {
+	public ResponseEntity<ErrorResponse> handleBindingError(ServletRequestBindingException exception) {
 		log.warn("Request binding failed: {}", exception.getMessage());
-		return buildResponse(HttpStatus.BAD_REQUEST, "Required request parameter or header is missing");
+		return buildResponse(HttpStatus.BAD_REQUEST, ErrorCode.BAD_REQUEST,
+				"Required request parameter or header is missing");
 	}
 
 	@ExceptionHandler
-	public ResponseEntity<Map<String, String>> handleTypeMismatch(MethodArgumentTypeMismatchException exception) {
+	public ResponseEntity<ErrorResponse> handleTypeMismatch(MethodArgumentTypeMismatchException exception) {
 		log.warn("Request value type mismatch: {}", exception.getMessage());
-		return buildResponse(HttpStatus.BAD_REQUEST, "Invalid request value format");
+		return buildResponse(HttpStatus.BAD_REQUEST, ErrorCode.BAD_REQUEST, "Invalid request value format");
 	}
 
 	@ExceptionHandler
-	public ResponseEntity<Map<String, String>> handleUnreadableMessage(HttpMessageNotReadableException exception) {
+	public ResponseEntity<ErrorResponse> handleUnreadableMessage(HttpMessageNotReadableException exception) {
 		log.warn("Request body is not readable: {}", exception.getMessage());
-		return buildResponse(HttpStatus.BAD_REQUEST, "Request body is malformed");
+		return buildResponse(HttpStatus.BAD_REQUEST, ErrorCode.BAD_REQUEST, "Request body is malformed");
 	}
 
 	@ExceptionHandler
-	public ResponseEntity<Map<String, String>> handleNoResourceFound(NoResourceFoundException exception) {
-		return buildResponse(HttpStatus.NOT_FOUND, "Resource not found");
+	public ResponseEntity<ErrorResponse> handleNoResourceFound(NoResourceFoundException exception) {
+		return buildResponse(HttpStatus.NOT_FOUND, ErrorCode.NOT_FOUND, "Resource not found");
 	}
 
 	@ExceptionHandler
-	public ResponseEntity<Map<String, String>> handleShareitException(ShareitException exception) {
+	public ResponseEntity<ErrorResponse> handleShareitException(ShareitException exception) {
 		log.error("Unexpected application error", exception);
-		return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage());
+		return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.INTERNAL_ERROR, exception.getMessage());
 	}
 
 	@ExceptionHandler
-	public ResponseEntity<Map<String, String>> handleUnexpected(Exception exception) {
+	public ResponseEntity<ErrorResponse> handleUnexpected(Exception exception) {
 		log.error("Unexpected error", exception);
-		return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage());
+		return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.INTERNAL_ERROR, exception.getMessage());
 	}
 
-	private ResponseEntity<Map<String, String>> buildResponse(HttpStatus status, String message) {
-		return ResponseEntity.status(status).body(Map.of("error", message));
+	private String formatFieldError(FieldError error) {
+		return error.getField() + ": " + error.getDefaultMessage();
+	}
+
+	private ResponseEntity<ErrorResponse> buildResponse(HttpStatus status, ErrorCode code, String message) {
+		return ResponseEntity.status(status).body(ErrorResponse.of(code, message));
+	}
+
+	private ResponseEntity<ErrorResponse> buildResponse(HttpStatus status,
+														ErrorCode code,
+														String message,
+														List<String> details) {
+		return ResponseEntity.status(status).body(ErrorResponse.of(code, message, details));
 	}
 }

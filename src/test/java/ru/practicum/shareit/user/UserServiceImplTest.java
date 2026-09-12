@@ -2,8 +2,8 @@ package ru.practicum.shareit.user;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.practicum.shareit.utils.exception.impl.ConflictException;
-import ru.practicum.shareit.utils.exception.impl.NotFoundException;
+import ru.practicum.shareit.utils.exception.errors.impl.ConflictException;
+import ru.practicum.shareit.utils.exception.errors.impl.NotFoundException;
 import ru.practicum.shareit.user.entity.model.User;
 import ru.practicum.shareit.user.storage.InMemoryUserStorage;
 

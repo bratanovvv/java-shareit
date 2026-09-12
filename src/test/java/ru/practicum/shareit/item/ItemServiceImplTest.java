@@ -2,8 +2,8 @@ package ru.practicum.shareit.item;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.practicum.shareit.utils.exception.impl.ForbiddenException;
-import ru.practicum.shareit.utils.exception.impl.NotFoundException;
+import ru.practicum.shareit.utils.exception.errors.impl.ForbiddenException;
+import ru.practicum.shareit.utils.exception.errors.impl.NotFoundException;
 import ru.practicum.shareit.item.entity.model.Item;
 import ru.practicum.shareit.item.storage.InMemoryItemStorage;
 import ru.practicum.shareit.user.UserService;

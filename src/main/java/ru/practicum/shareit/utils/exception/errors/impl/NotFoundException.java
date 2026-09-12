@@ -1,6 +1,6 @@
-package ru.practicum.shareit.utils.exception.impl;
+package ru.practicum.shareit.utils.exception.errors.impl;
 
-import ru.practicum.shareit.utils.exception.ShareitException;
+import ru.practicum.shareit.utils.exception.errors.ShareitException;
 
 public class NotFoundException extends ShareitException {
 
