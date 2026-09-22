@@ -1,12 +1,24 @@
 package ru.practicum.shareit.item.entity;
 
 import org.springframework.stereotype.Component;
+import ru.practicum.shareit.booking.entity.dto.BookingShortDto;
+import ru.practicum.shareit.booking.entity.model.Booking;
+import ru.practicum.shareit.item.entity.dto.CommentDto;
 import ru.practicum.shareit.item.entity.dto.ItemDto;
+import ru.practicum.shareit.item.entity.model.Comment;
 import ru.practicum.shareit.item.entity.model.Item;
 import ru.practicum.shareit.utils.mapper.Mapper;
 
+import java.util.List;
+
 @Component
 public final class ItemMapper implements Mapper<Item, ItemDto> {
+
+	private final Mapper<Comment, CommentDto> commentMapper;
+
+	public ItemMapper(Mapper<Comment, CommentDto> commentMapper) {
+		this.commentMapper = commentMapper;
+	}
 
 	@Override
 	public ItemDto toDto(Item item) {
@@ -15,7 +27,10 @@ public final class ItemMapper implements Mapper<Item, ItemDto> {
 				item.getName(),
 				item.getDescription(),
 				item.getAvailable(),
-				item.getRequest() != null ? item.getRequest().getId() : null
+				item.getRequest() != null ? item.getRequest().getId() : null,
+				toShortDto(item.getLastBooking()),
+				toShortDto(item.getNextBooking()),
+				toCommentDtos(item.getComments())
 		);
 	}
 
@@ -27,7 +42,31 @@ public final class ItemMapper implements Mapper<Item, ItemDto> {
 				itemDto.getDescription(),
 				itemDto.getAvailable(),
 				null,
+				null,
+				null,
+				null,
 				null
 		);
+	}
+
+	private BookingShortDto toShortDto(Booking booking) {
+		if (booking == null) {
+			return null;
+		}
+		return new BookingShortDto(
+				booking.getId(),
+				booking.getBooker().getId(),
+				booking.getStart(),
+				booking.getEnd()
+		);
+	}
+
+	private List<CommentDto> toCommentDtos(List<Comment> comments) {
+		if (comments == null) {
+			return List.of();
+		}
+		return comments.stream()
+				.map(commentMapper::toDto)
+				.toList();
 	}
 }

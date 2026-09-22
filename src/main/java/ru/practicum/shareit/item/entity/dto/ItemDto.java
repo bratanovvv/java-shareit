@@ -6,7 +6,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import ru.practicum.shareit.booking.entity.dto.BookingShortDto;
 import ru.practicum.shareit.utils.validation.group.Create;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -26,4 +29,10 @@ public class ItemDto {
 	private Boolean available;
 
 	private Long requestId;
+
+	private BookingShortDto lastBooking;
+
+	private BookingShortDto nextBooking;
+
+	private List<CommentDto> comments;
 }

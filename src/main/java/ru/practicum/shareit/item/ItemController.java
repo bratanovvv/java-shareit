@@ -11,7 +11,9 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import ru.practicum.shareit.item.entity.dto.CommentDto;
 import ru.practicum.shareit.item.entity.dto.ItemDto;
+import ru.practicum.shareit.item.entity.model.Comment;
 import ru.practicum.shareit.item.entity.model.Item;
 import ru.practicum.shareit.utils.mapper.Mapper;
 import ru.practicum.shareit.utils.validation.group.Create;
@@ -28,11 +30,14 @@ public class ItemController {
 
 	private final ItemService itemService;
 	private final Mapper<Item, ItemDto> mapper;
+	private final Mapper<Comment, CommentDto> commentMapper;
 
 	public ItemController(ItemService itemService,
-						  Mapper<Item, ItemDto> mapper) {
+						  Mapper<Item, ItemDto> mapper,
+						  Mapper<Comment, CommentDto> commentMapper) {
 		this.itemService = itemService;
 		this.mapper = mapper;
+		this.commentMapper = commentMapper;
 	}
 
 	@PostMapping
@@ -53,9 +58,10 @@ public class ItemController {
 	}
 
 	@GetMapping("/{itemId}")
-	public ItemDto getById(@PathVariable long itemId) {
-		log.info("Getting item {}", itemId);
-		return mapper.toDto(itemService.getById(itemId));
+	public ItemDto getById(@RequestHeader(USER_ID_HEADER) long userId,
+						   @PathVariable long itemId) {
+		log.info("Getting item {} for user {}", itemId, userId);
+		return mapper.toDto(itemService.getById(userId, itemId));
 	}
 
 	@GetMapping
@@ -72,5 +78,14 @@ public class ItemController {
 		return itemService.search(text).stream()
 				.map(mapper::toDto)
 				.toList();
+	}
+
+	@PostMapping("/{itemId}/comment")
+	public CommentDto addComment(@RequestHeader(USER_ID_HEADER) long userId,
+								 @PathVariable long itemId,
+								 @RequestBody @Validated(Create.class) CommentDto commentDto) {
+		log.info("Adding comment to item {} by user {}", itemId, userId);
+		Comment comment = itemService.addComment(userId, itemId, commentMapper.toEntity(commentDto));
+		return commentMapper.toDto(comment);
 	}
 }
