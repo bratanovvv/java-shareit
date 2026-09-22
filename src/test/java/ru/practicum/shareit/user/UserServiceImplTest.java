@@ -2,23 +2,29 @@ package ru.practicum.shareit.user;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import ru.practicum.shareit.user.entity.model.User;
+import ru.practicum.shareit.user.storage.UserRepository;
 import ru.practicum.shareit.utils.exception.errors.impl.ConflictException;
 import ru.practicum.shareit.utils.exception.errors.impl.NotFoundException;
-import ru.practicum.shareit.user.entity.model.User;
-import ru.practicum.shareit.user.storage.InMemoryUserStorage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static ru.practicum.shareit.utils.TestDataFactory.user;
 
+@DataJpaTest
 class UserServiceImplTest {
+
+	@Autowired
+	private UserRepository userRepository;
 
 	private UserServiceImpl userService;
 
 	@BeforeEach
 	void setUp() {
-		userService = new UserServiceImpl(new InMemoryUserStorage());
+		userService = new UserServiceImpl(userRepository);
 	}
 
 	@Test

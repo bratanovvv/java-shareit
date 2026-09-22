@@ -2,13 +2,15 @@ package ru.practicum.shareit.item;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.practicum.shareit.utils.exception.errors.impl.ForbiddenException;
-import ru.practicum.shareit.utils.exception.errors.impl.NotFoundException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import ru.practicum.shareit.item.entity.model.Item;
-import ru.practicum.shareit.item.storage.InMemoryItemStorage;
+import ru.practicum.shareit.item.storage.ItemRepository;
 import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.user.UserServiceImpl;
-import ru.practicum.shareit.user.storage.InMemoryUserStorage;
+import ru.practicum.shareit.user.storage.UserRepository;
+import ru.practicum.shareit.utils.exception.errors.impl.ForbiddenException;
+import ru.practicum.shareit.utils.exception.errors.impl.NotFoundException;
 
 import java.util.List;
 
@@ -19,7 +21,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static ru.practicum.shareit.utils.TestDataFactory.item;
 import static ru.practicum.shareit.utils.TestDataFactory.user;
 
+@DataJpaTest
 class ItemServiceImplTest {
+
+	@Autowired
+	private UserRepository userRepository;
+
+	@Autowired
+	private ItemRepository itemRepository;
 
 	private ItemServiceImpl itemService;
 	private UserService userService;
@@ -28,8 +37,8 @@ class ItemServiceImplTest {
 
 	@BeforeEach
 	void setUp() {
-		userService = new UserServiceImpl(new InMemoryUserStorage());
-		itemService = new ItemServiceImpl(new InMemoryItemStorage(), userService);
+		userService = new UserServiceImpl(userRepository);
+		itemService = new ItemServiceImpl(itemRepository, userService);
 		ownerId = userService.create(user("owner", "owner@email.com")).getId();
 		otherUserId = userService.create(user("other", "other@email.com")).getId();
 	}
