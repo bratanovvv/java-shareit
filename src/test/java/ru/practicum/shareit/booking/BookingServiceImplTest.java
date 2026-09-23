@@ -16,6 +16,7 @@ import ru.practicum.shareit.item.storage.ItemRepository;
 import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.user.UserServiceImpl;
 import ru.practicum.shareit.user.storage.UserRepository;
+import ru.practicum.shareit.utils.exception.errors.impl.ForbiddenException;
 import ru.practicum.shareit.utils.exception.errors.impl.NotFoundException;
 import ru.practicum.shareit.utils.exception.errors.impl.ValidationException;
 
@@ -119,7 +120,7 @@ class BookingServiceImplTest {
 		Booking created = bookingService.create(bookerId, booking(itemId, LocalDateTime.now().plusDays(1),
 				LocalDateTime.now().plusDays(2)));
 
-		assertThrows(NotFoundException.class, () -> bookingService.approve(bookerId, created.getId(), true));
+		assertThrows(ForbiddenException.class, () -> bookingService.approve(bookerId, created.getId(), true));
 	}
 
 	@Test

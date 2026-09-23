@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.shareit.booking.entity.dto.BookingDto;
 import ru.practicum.shareit.booking.entity.dto.BookingState;
 import ru.practicum.shareit.booking.entity.model.Booking;
+import ru.practicum.shareit.utils.http.RequestHeaders;
 import ru.practicum.shareit.utils.mapper.Mapper;
 import ru.practicum.shareit.utils.validation.group.Create;
 
@@ -23,8 +24,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/bookings")
 public class BookingController {
-
-	private static final String USER_ID_HEADER = "X-Sharer-User-Id";
 
 	private final BookingService bookingService;
 	private final Mapper<Booking, BookingDto> mapper;
@@ -36,7 +35,7 @@ public class BookingController {
 	}
 
 	@PostMapping
-	public BookingDto create(@RequestHeader(USER_ID_HEADER) long userId,
+	public BookingDto create(@RequestHeader(RequestHeaders.USER_ID) long userId,
 							 @RequestBody @Validated(Create.class) BookingDto bookingDto) {
 		log.info("Creating booking for user {}", userId);
 		Booking created = bookingService.create(userId, mapper.toEntity(bookingDto));
@@ -44,7 +43,7 @@ public class BookingController {
 	}
 
 	@PatchMapping("/{bookingId}")
-	public BookingDto approve(@RequestHeader(USER_ID_HEADER) long userId,
+	public BookingDto approve(@RequestHeader(RequestHeaders.USER_ID) long userId,
 							  @PathVariable long bookingId,
 							  @RequestParam boolean approved) {
 		log.info("User {} sets approval={} for booking {}", userId, approved, bookingId);
@@ -52,27 +51,23 @@ public class BookingController {
 	}
 
 	@GetMapping("/{bookingId}")
-	public BookingDto getById(@RequestHeader(USER_ID_HEADER) long userId,
+	public BookingDto getById(@RequestHeader(RequestHeaders.USER_ID) long userId,
 							  @PathVariable long bookingId) {
 		log.info("Getting booking {} for user {}", bookingId, userId);
 		return mapper.toDto(bookingService.getById(userId, bookingId));
 	}
 
 	@GetMapping
-	public List<BookingDto> getByBooker(@RequestHeader(USER_ID_HEADER) long userId,
+	public List<BookingDto> getByBooker(@RequestHeader(RequestHeaders.USER_ID) long userId,
 										@RequestParam(defaultValue = "ALL") BookingState state) {
 		log.info("Getting bookings of user {} with state {}", userId, state);
-		return bookingService.getByBooker(userId, state).stream()
-				.map(mapper::toDto)
-				.toList();
+		return mapper.toDtoList(bookingService.getByBooker(userId, state));
 	}
 
 	@GetMapping("/owner")
-	public List<BookingDto> getByOwner(@RequestHeader(USER_ID_HEADER) long userId,
+	public List<BookingDto> getByOwner(@RequestHeader(RequestHeaders.USER_ID) long userId,
 									   @RequestParam(defaultValue = "ALL") BookingState state) {
 		log.info("Getting bookings of items owned by user {} with state {}", userId, state);
-		return bookingService.getByOwner(userId, state).stream()
-				.map(mapper::toDto)
-				.toList();
+		return mapper.toDtoList(bookingService.getByOwner(userId, state));
 	}
 }

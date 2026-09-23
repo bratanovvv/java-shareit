@@ -55,7 +55,7 @@ public class BookingServiceImpl implements BookingService {
 			throw new ForbiddenException("Booking with id " + bookingId + " not found for this owner");
 		}
 		if (booking.getStatus() != BookingStatus.WAITING) {
-			throw new ValidationException("Booking status is already decided");
+			throw new ForbiddenException("Booking status is already decided");
 		}
 		booking.setStatus(approved ? BookingStatus.APPROVED : BookingStatus.REJECTED);
 		return bookingRepository.save(booking);

@@ -15,6 +15,7 @@ import ru.practicum.shareit.item.entity.dto.CommentDto;
 import ru.practicum.shareit.item.entity.dto.ItemDto;
 import ru.practicum.shareit.item.entity.model.Comment;
 import ru.practicum.shareit.item.entity.model.Item;
+import ru.practicum.shareit.utils.http.RequestHeaders;
 import ru.practicum.shareit.utils.mapper.Mapper;
 import ru.practicum.shareit.utils.validation.group.Create;
 import ru.practicum.shareit.utils.validation.group.Update;
@@ -25,8 +26,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/items")
 public class ItemController {
-
-	private static final String USER_ID_HEADER = "X-Sharer-User-Id";
 
 	private final ItemService itemService;
 	private final Mapper<Item, ItemDto> mapper;
@@ -41,7 +40,7 @@ public class ItemController {
 	}
 
 	@PostMapping
-	public ItemDto create(@RequestHeader(USER_ID_HEADER) long userId,
+	public ItemDto create(@RequestHeader(RequestHeaders.USER_ID) long userId,
 						  @RequestBody @Validated(Create.class) ItemDto itemDto) {
 		log.info("Creating item for owner {}", userId);
 		Item created = itemService.create(userId, mapper.toEntity(itemDto));
@@ -49,7 +48,7 @@ public class ItemController {
 	}
 
 	@PatchMapping("/{itemId}")
-	public ItemDto update(@RequestHeader(USER_ID_HEADER) long userId,
+	public ItemDto update(@RequestHeader(RequestHeaders.USER_ID) long userId,
 						  @PathVariable long itemId,
 			@RequestBody @Validated(Update.class) ItemDto itemDto) {
 		log.info("Updating item {} by user {}", itemId, userId);
@@ -58,30 +57,26 @@ public class ItemController {
 	}
 
 	@GetMapping("/{itemId}")
-	public ItemDto getById(@RequestHeader(USER_ID_HEADER) long userId,
+	public ItemDto getById(@RequestHeader(RequestHeaders.USER_ID) long userId,
 						   @PathVariable long itemId) {
 		log.info("Getting item {} for user {}", itemId, userId);
 		return mapper.toDto(itemService.getById(userId, itemId));
 	}
 
 	@GetMapping
-	public List<ItemDto> getByOwner(@RequestHeader(USER_ID_HEADER) long userId) {
+	public List<ItemDto> getByOwner(@RequestHeader(RequestHeaders.USER_ID) long userId) {
 		log.info("Getting items of owner {}", userId);
-		return itemService.getByOwner(userId).stream()
-				.map(mapper::toDto)
-				.toList();
+		return mapper.toDtoList(itemService.getByOwner(userId));
 	}
 
 	@GetMapping("/search")
 	public List<ItemDto> search(@RequestParam String text) {
 		log.info("Searching items with text '{}'", text);
-		return itemService.search(text).stream()
-				.map(mapper::toDto)
-				.toList();
+		return mapper.toDtoList(itemService.search(text));
 	}
 
 	@PostMapping("/{itemId}/comment")
-	public CommentDto addComment(@RequestHeader(USER_ID_HEADER) long userId,
+	public CommentDto addComment(@RequestHeader(RequestHeaders.USER_ID) long userId,
 								 @PathVariable long itemId,
 								 @RequestBody @Validated(Create.class) CommentDto commentDto) {
 		log.info("Adding comment to item {} by user {}", itemId, userId);

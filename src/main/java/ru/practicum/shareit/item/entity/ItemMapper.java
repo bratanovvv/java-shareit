@@ -1,7 +1,7 @@
 package ru.practicum.shareit.item.entity;
 
 import org.springframework.stereotype.Component;
-import ru.practicum.shareit.booking.entity.dto.BookingShortDto;
+import ru.practicum.shareit.booking.entity.dto.BookingInfoDto;
 import ru.practicum.shareit.booking.entity.model.Booking;
 import ru.practicum.shareit.item.entity.dto.CommentDto;
 import ru.practicum.shareit.item.entity.dto.ItemDto;
@@ -49,11 +49,11 @@ public final class ItemMapper implements Mapper<Item, ItemDto> {
 		);
 	}
 
-	private BookingShortDto toShortDto(Booking booking) {
+	private BookingInfoDto toShortDto(Booking booking) {
 		if (booking == null) {
 			return null;
 		}
-		return new BookingShortDto(
+		return new BookingInfoDto(
 				booking.getId(),
 				booking.getBooker().getId(),
 				booking.getStart(),
@@ -62,11 +62,6 @@ public final class ItemMapper implements Mapper<Item, ItemDto> {
 	}
 
 	private List<CommentDto> toCommentDtos(List<Comment> comments) {
-		if (comments == null) {
-			return List.of();
-		}
-		return comments.stream()
-				.map(commentMapper::toDto)
-				.toList();
+		return commentMapper.toDtoList(comments);
 	}
 }
