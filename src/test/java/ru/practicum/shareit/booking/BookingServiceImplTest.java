@@ -18,7 +18,7 @@ import ru.practicum.shareit.user.UserServiceImpl;
 import ru.practicum.shareit.user.storage.UserRepository;
 import ru.practicum.shareit.utils.exception.errors.impl.ForbiddenException;
 import ru.practicum.shareit.utils.exception.errors.impl.NotFoundException;
-import ru.practicum.shareit.utils.exception.errors.impl.ValidationException;
+import ru.practicum.shareit.utils.exception.errors.impl.BusinessException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -77,7 +77,7 @@ class BookingServiceImplTest {
 	void createShouldRejectUnavailableItem() {
 		Item unavailable = itemRepository.save(itemWithOwner(ownerId, false));
 
-		assertThrows(ValidationException.class, () -> bookingService.create(bookerId,
+		assertThrows(BusinessException.class, () -> bookingService.create(bookerId,
 				booking(unavailable.getId(), LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(2))));
 	}
 
@@ -112,7 +112,7 @@ class BookingServiceImplTest {
 				LocalDateTime.now().plusDays(2)));
 		bookingService.approve(ownerId, created.getId(), true);
 
-		assertThrows(ValidationException.class, () -> bookingService.approve(ownerId, created.getId(), false));
+		assertThrows(BusinessException.class, () -> bookingService.approve(ownerId, created.getId(), false));
 	}
 
 	@Test

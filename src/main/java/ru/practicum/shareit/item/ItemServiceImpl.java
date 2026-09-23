@@ -11,9 +11,9 @@ import ru.practicum.shareit.item.storage.CommentRepository;
 import ru.practicum.shareit.item.storage.ItemRepository;
 import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.user.entity.model.User;
+import ru.practicum.shareit.utils.exception.errors.impl.BusinessException;
 import ru.practicum.shareit.utils.exception.errors.impl.ForbiddenException;
 import ru.practicum.shareit.utils.exception.errors.impl.NotFoundException;
-import ru.practicum.shareit.utils.exception.errors.impl.ValidationException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -114,7 +114,7 @@ public class ItemServiceImpl implements ItemService {
 				.findCompletedBookings(userId, itemId, BookingStatus.APPROVED, now)
 				.isEmpty();
 		if (!hasCompletedBooking) {
-			throw new ValidationException("User " + userId + " has not rented item " + itemId);
+			throw new BusinessException("User " + userId + " has not rented item " + itemId);
 		}
 		comment.setItem(item);
 		comment.setAuthor(author);

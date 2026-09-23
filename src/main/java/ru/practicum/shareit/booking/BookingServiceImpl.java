@@ -10,9 +10,9 @@ import ru.practicum.shareit.item.ItemService;
 import ru.practicum.shareit.item.entity.model.Item;
 import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.user.entity.model.User;
+import ru.practicum.shareit.utils.exception.errors.impl.BusinessException;
 import ru.practicum.shareit.utils.exception.errors.impl.ForbiddenException;
 import ru.practicum.shareit.utils.exception.errors.impl.NotFoundException;
-import ru.practicum.shareit.utils.exception.errors.impl.ValidationException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -36,7 +36,7 @@ public class BookingServiceImpl implements BookingService {
 		User booker = userService.getById(userId);
 		Item item = itemService.getById(booking.getItem().getId());
 		if (!Boolean.TRUE.equals(item.getAvailable())) {
-			throw new ValidationException("Item with id " + item.getId() + " is not available for booking");
+			throw new BusinessException("Item with id " + item.getId() + " is not available for booking");
 		}
 		if (item.getOwner().getId().equals(userId)) {
 			throw new NotFoundException("Owner cannot book own item");
@@ -55,7 +55,7 @@ public class BookingServiceImpl implements BookingService {
 			throw new ForbiddenException("Booking with id " + bookingId + " not found for this owner");
 		}
 		if (booking.getStatus() != BookingStatus.WAITING) {
-			throw new ForbiddenException("Booking status is already decided");
+			throw new BusinessException("Booking status is already decided");
 		}
 		booking.setStatus(approved ? BookingStatus.APPROVED : BookingStatus.REJECTED);
 		return bookingRepository.save(booking);

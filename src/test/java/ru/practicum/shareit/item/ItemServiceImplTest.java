@@ -14,9 +14,9 @@ import ru.practicum.shareit.item.storage.ItemRepository;
 import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.user.UserServiceImpl;
 import ru.practicum.shareit.user.storage.UserRepository;
+import ru.practicum.shareit.utils.exception.errors.impl.BusinessException;
 import ru.practicum.shareit.utils.exception.errors.impl.ForbiddenException;
 import ru.practicum.shareit.utils.exception.errors.impl.NotFoundException;
-import ru.practicum.shareit.utils.exception.errors.impl.ValidationException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -194,7 +194,7 @@ class ItemServiceImplTest {
 		bookingRepository.save(booking(created.getId(), otherUserId, now.plusDays(1), now.plusDays(2),
 				BookingStatus.APPROVED));
 
-		assertThrows(ValidationException.class,
+		assertThrows(BusinessException.class,
 				() -> itemService.addComment(otherUserId, created.getId(), comment("Not yet")));
 	}
 
