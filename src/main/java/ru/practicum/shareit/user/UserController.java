@@ -55,9 +55,7 @@ public class UserController {
 	@GetMapping
 	public List<UserDto> getAll() {
 		log.info("Getting all users");
-		return userService.getAll().stream()
-				.map(mapper::toDto)
-				.toList();
+		return mapper.toDtoList(userService.getAll());
 	}
 
 	@DeleteMapping("/{userId}")
