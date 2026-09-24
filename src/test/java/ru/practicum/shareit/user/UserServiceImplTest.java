@@ -79,4 +79,9 @@ class UserServiceImplTest {
 		userService.delete(created.getId());
 		assertThrows(NotFoundException.class, () -> userService.getById(created.getId()));
 	}
+
+	@Test
+	void deleteShouldThrowWhenUserMissing() {
+		assertThrows(NotFoundException.class, () -> userService.delete(99L));
+	}
 }

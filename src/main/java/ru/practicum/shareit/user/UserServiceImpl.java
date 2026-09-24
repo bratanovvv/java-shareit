@@ -48,6 +48,14 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	@Transactional(readOnly = true)
+	public void checkExists(long userId) {
+		if (!userRepository.existsById(userId)) {
+			throw new NotFoundException("User with id " + userId + " not found");
+		}
+	}
+
+	@Override
+	@Transactional(readOnly = true)
 	public List<User> getAll() {
 		return userRepository.findAll();
 	}
@@ -55,9 +63,8 @@ public class UserServiceImpl implements UserService {
 	@Override
 	@Transactional
 	public void delete(long userId) {
-		if (userRepository.existsById(userId)) {
-			userRepository.deleteById(userId);
-		}
+		checkExists(userId);
+		userRepository.deleteById(userId);
 	}
 
 	private void checkEmailNotTaken(String email, Long currentUserId) {

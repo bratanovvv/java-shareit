@@ -7,6 +7,7 @@ import ru.practicum.shareit.booking.entity.model.Booking;
 import ru.practicum.shareit.booking.entity.model.BookingStatus;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
@@ -62,16 +63,16 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 	List<Booking> findByOwnerAndStatus(@Param("ownerId") long ownerId, @Param("status") BookingStatus status);
 
 	@Query("SELECT b FROM Booking b "
-			+ "WHERE b.item.id = :itemId AND b.status = :status AND b.start < :now "
+			+ "WHERE b.item.id IN :itemIds AND b.status = :status AND b.start < :now "
 			+ "ORDER BY b.start DESC")
-	List<Booking> findLastBookings(@Param("itemId") long itemId,
+	List<Booking> findLastBookings(@Param("itemIds") Collection<Long> itemIds,
 								   @Param("status") BookingStatus status,
 								   @Param("now") LocalDateTime now);
 
 	@Query("SELECT b FROM Booking b "
-			+ "WHERE b.item.id = :itemId AND b.status = :status AND b.start > :now "
+			+ "WHERE b.item.id IN :itemIds AND b.status = :status AND b.start > :now "
 			+ "ORDER BY b.start ASC")
-	List<Booking> findNextBookings(@Param("itemId") long itemId,
+	List<Booking> findNextBookings(@Param("itemIds") Collection<Long> itemIds,
 								   @Param("status") BookingStatus status,
 								   @Param("now") LocalDateTime now);
 

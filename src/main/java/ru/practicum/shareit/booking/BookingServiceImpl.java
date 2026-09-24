@@ -52,7 +52,7 @@ public class BookingServiceImpl implements BookingService {
 	public Booking approve(long userId, long bookingId, boolean approved) {
 		Booking booking = getBookingOrThrow(bookingId);
 		if (!booking.getItem().getOwner().getId().equals(userId)) {
-			throw new ForbiddenException("Booking with id " + bookingId + " not found for this owner");
+			throw new ForbiddenException("User " + userId + " is not the owner of booking " + bookingId);
 		}
 		if (booking.getStatus() != BookingStatus.WAITING) {
 			throw new BusinessException("Booking status is already decided");
@@ -76,7 +76,7 @@ public class BookingServiceImpl implements BookingService {
 	@Override
 	@Transactional(readOnly = true)
 	public List<Booking> getByBooker(long userId, BookingState state) {
-		userService.getById(userId);
+		userService.checkExists(userId);
 		LocalDateTime now = LocalDateTime.now();
 		return switch (state) {
 			case ALL -> bookingRepository.findAllByBooker(userId);
@@ -91,7 +91,7 @@ public class BookingServiceImpl implements BookingService {
 	@Override
 	@Transactional(readOnly = true)
 	public List<Booking> getByOwner(long userId, BookingState state) {
-		userService.getById(userId);
+		userService.checkExists(userId);
 		LocalDateTime now = LocalDateTime.now();
 		return switch (state) {
 			case ALL -> bookingRepository.findAllByOwner(userId);

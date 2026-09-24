@@ -12,6 +12,8 @@ public interface UserService {
 
 	User getById(long userId);
 
+	void checkExists(long userId);
+
 	List<User> getAll();
 
 	void delete(long userId);
