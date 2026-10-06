@@ -1,29 +1,32 @@
 package ru.practicum.shareit.user;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.utils.exception.errors.impl.ConflictException;
 import ru.practicum.shareit.utils.exception.errors.impl.NotFoundException;
 import ru.practicum.shareit.user.entity.model.User;
-import ru.practicum.shareit.user.storage.UserStorage;
+import ru.practicum.shareit.user.storage.UserRepository;
 
 import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
 
-	private final UserStorage userStorage;
+	private final UserRepository userRepository;
 
-	public UserServiceImpl(UserStorage userStorage) {
-		this.userStorage = userStorage;
+	public UserServiceImpl(UserRepository userRepository) {
+		this.userRepository = userRepository;
 	}
 
 	@Override
+	@Transactional
 	public User create(User user) {
 		checkEmailNotTaken(user.getEmail(), null);
-		return userStorage.save(user);
+		return userRepository.save(user);
 	}
 
 	@Override
+	@Transactional
 	public User update(long userId, User user) {
 		User existing = getById(userId);
 		if (user.getEmail() != null) {
@@ -33,27 +36,39 @@ public class UserServiceImpl implements UserService {
 		if (user.getName() != null) {
 			existing.setName(user.getName());
 		}
-		return userStorage.save(existing);
+		return userRepository.save(existing);
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public User getById(long userId) {
-		return userStorage.findById(userId)
+		return userRepository.findById(userId)
 				.orElseThrow(() -> new NotFoundException("User with id " + userId + " not found"));
 	}
 
 	@Override
-	public List<User> getAll() {
-		return userStorage.findAll();
+	@Transactional(readOnly = true)
+	public void checkExists(long userId) {
+		if (!userRepository.existsById(userId)) {
+			throw new NotFoundException("User with id " + userId + " not found");
+		}
 	}
 
 	@Override
+	@Transactional(readOnly = true)
+	public List<User> getAll() {
+		return userRepository.findAll();
+	}
+
+	@Override
+	@Transactional
 	public void delete(long userId) {
-		userStorage.deleteById(userId);
+		checkExists(userId);
+		userRepository.deleteById(userId);
 	}
 
 	private void checkEmailNotTaken(String email, Long currentUserId) {
-		userStorage.findByEmail(email)
+		userRepository.findByEmail(email)
 				.filter(user -> !user.getId().equals(currentUserId))
 				.ifPresent(user -> {
 					throw new ConflictException("Email is already in use");

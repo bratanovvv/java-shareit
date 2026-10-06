@@ -14,10 +14,10 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 import ru.practicum.shareit.utils.exception.model.ErrorCode;
 import ru.practicum.shareit.utils.exception.model.ErrorResponse;
 import ru.practicum.shareit.utils.exception.errors.ShareitException;
+import ru.practicum.shareit.utils.exception.errors.impl.BusinessException;
 import ru.practicum.shareit.utils.exception.errors.impl.ConflictException;
 import ru.practicum.shareit.utils.exception.errors.impl.ForbiddenException;
 import ru.practicum.shareit.utils.exception.errors.impl.NotFoundException;
-import ru.practicum.shareit.utils.exception.errors.impl.ValidationException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -45,9 +45,9 @@ public class ErrorHandler {
 	}
 
 	@ExceptionHandler
-	public ResponseEntity<ErrorResponse> handleValidation(ValidationException exception) {
-		log.warn("Validation failed: {}", exception.getMessage());
-		return buildResponse(HttpStatus.BAD_REQUEST, ErrorCode.VALIDATION_ERROR, exception.getMessage());
+	public ResponseEntity<ErrorResponse> handleBusiness(BusinessException exception) {
+		log.warn("Business rule violated: {}", exception.getMessage());
+		return buildResponse(HttpStatus.BAD_REQUEST, ErrorCode.BAD_REQUEST, exception.getMessage());
 	}
 
 	@ExceptionHandler

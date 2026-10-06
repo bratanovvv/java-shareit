@@ -21,6 +21,6 @@ public final class TestDataFactory {
 	}
 
 	public static Item item(String name, String description, Boolean available) {
-		return new Item(null, name, description, available, null, null);
+		return new Item(null, name, description, available, null, null, null, null, null);
 	}
 }
