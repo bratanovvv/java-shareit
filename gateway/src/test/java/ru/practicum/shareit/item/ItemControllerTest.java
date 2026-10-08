@@ -15,6 +15,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -70,6 +71,34 @@ class ItemControllerTest extends ControllerTestSupport {
 		when(itemClient.search(anyString())).thenReturn(new ResponseEntity<>(HttpStatus.OK));
 
 		mockMvc.perform(get("/items/search").param("text", "drill"))
+				.andExpect(status().isOk());
+	}
+
+	@Test
+	void updateShouldForwardToClient() throws Exception {
+		when(itemClient.updateItem(anyLong(), anyLong(), any(ItemDto.class)))
+				.thenReturn(new ResponseEntity<>(HttpStatus.OK));
+
+		mockMvc.perform(patch("/items/1")
+						.header(RequestHeaders.USER_ID, 1L)
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(json(itemDto(null, "Drill", "Power drill", true, null))))
+				.andExpect(status().isOk());
+	}
+
+	@Test
+	void getItemShouldForwardToClient() throws Exception {
+		when(itemClient.getItem(1L, 1L)).thenReturn(new ResponseEntity<>(HttpStatus.OK));
+
+		mockMvc.perform(get("/items/1").header(RequestHeaders.USER_ID, 1L))
+				.andExpect(status().isOk());
+	}
+
+	@Test
+	void getItemsShouldForwardToClient() throws Exception {
+		when(itemClient.getItems(1L)).thenReturn(new ResponseEntity<>(HttpStatus.OK));
+
+		mockMvc.perform(get("/items").header(RequestHeaders.USER_ID, 1L))
 				.andExpect(status().isOk());
 	}
 

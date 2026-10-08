@@ -12,6 +12,7 @@ import ru.practicum.shareit.utils.ControllerTestSupport;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -53,6 +54,14 @@ class UserControllerTest extends ControllerTestSupport {
 	}
 
 	@Test
+	void createWithMalformedJsonShouldReturnBadRequest() throws Exception {
+		mockMvc.perform(post("/users")
+						.contentType(MediaType.APPLICATION_JSON)
+						.content("{invalid"))
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
 	void updateShouldForwardToClient() throws Exception {
 		when(userClient.updateUser(anyLong(), any(UserDto.class))).thenReturn(new ResponseEntity<>(HttpStatus.OK));
 
@@ -75,6 +84,14 @@ class UserControllerTest extends ControllerTestSupport {
 		when(userClient.getUsers()).thenReturn(new ResponseEntity<>(HttpStatus.OK));
 
 		mockMvc.perform(get("/users"))
+				.andExpect(status().isOk());
+	}
+
+	@Test
+	void deleteShouldForwardToClient() throws Exception {
+		when(userClient.deleteUser(1L)).thenReturn(new ResponseEntity<>(HttpStatus.OK));
+
+		mockMvc.perform(delete("/users/1"))
 				.andExpect(status().isOk());
 	}
 }

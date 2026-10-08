@@ -98,6 +98,14 @@
 					<version>0.8.12</version>
 					<configuration>
 						<output>file</output>
+						<excludes>
+							<exclude>**/ShareItApp.class</exclude>
+							<exclude>**/ShareItGateway.class</exclude>
+							<exclude>**/UserClient.class</exclude>
+							<exclude>**/ItemClient.class</exclude>
+							<exclude>**/BookingClient.class</exclude>
+							<exclude>**/ItemRequestClient.class</exclude>
+						</excludes>
 					</configuration>
 					<executions>
 						<execution>

@@ -4,8 +4,10 @@ import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 import ru.practicum.shareit.utils.exception.model.ErrorCode;
 import ru.practicum.shareit.utils.exception.model.ErrorResponse;
 
@@ -34,6 +36,15 @@ class ErrorHandlerTest {
 		assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
 		assertEquals(ErrorCode.INTERNAL_ERROR, response.getBody().code());
 		assertEquals("Internal server error", response.getBody().error());
+	}
+
+	@Test
+	void shouldReturnStructuredNotFoundForMissingResource() {
+		ResponseEntity<ErrorResponse> response =
+				handler.handleNoResourceFound(new NoResourceFoundException(HttpMethod.GET, "/unknown"));
+
+		assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+		assertEquals(ErrorCode.NOT_FOUND, response.getBody().code());
 	}
 
 	@Test

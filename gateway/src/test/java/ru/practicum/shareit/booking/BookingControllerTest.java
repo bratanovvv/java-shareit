@@ -94,4 +94,26 @@ class BookingControllerTest extends ControllerTestSupport {
 		mockMvc.perform(get("/bookings").header(RequestHeaders.USER_ID, 1L))
 				.andExpect(status().isOk());
 	}
+
+	@Test
+	void getBookingShouldForwardToClient() throws Exception {
+		when(bookingClient.getBooking(anyLong(), anyLong())).thenReturn(new ResponseEntity<>(HttpStatus.OK));
+
+		mockMvc.perform(get("/bookings/1").header(RequestHeaders.USER_ID, 1L))
+				.andExpect(status().isOk());
+	}
+
+	@Test
+	void getBookingsByOwnerShouldForwardToClient() throws Exception {
+		when(bookingClient.getBookingsByOwner(anyLong(), any())).thenReturn(new ResponseEntity<>(HttpStatus.OK));
+
+		mockMvc.perform(get("/bookings/owner").header(RequestHeaders.USER_ID, 1L))
+				.andExpect(status().isOk());
+	}
+
+	@Test
+	void getBookingWithNonNumericIdShouldReturnBadRequest() throws Exception {
+		mockMvc.perform(get("/bookings/abc").header(RequestHeaders.USER_ID, 1L))
+				.andExpect(status().isBadRequest());
+	}
 }
