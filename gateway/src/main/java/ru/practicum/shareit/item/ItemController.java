@@ -29,43 +29,43 @@ public class ItemController {
 	private final ItemClient itemClient;
 
 	@PostMapping
-	public ResponseEntity<Object> createItem(@RequestHeader(RequestHeaders.USER_ID) long userId,
-											 @RequestBody @Validated(Create.class) ItemDto itemDto) {
+	public ResponseEntity<ItemDto> createItem(@RequestHeader(RequestHeaders.USER_ID) long userId,
+											  @RequestBody @Validated(Create.class) ItemDto itemDto) {
 		log.info("Creating item {} for owner {}", itemDto, userId);
 		return itemClient.createItem(userId, itemDto);
 	}
 
 	@PatchMapping("/{itemId}")
-	public ResponseEntity<Object> updateItem(@RequestHeader(RequestHeaders.USER_ID) long userId,
-											 @PathVariable long itemId,
-											 @RequestBody @Validated(Update.class) ItemDto itemDto) {
+	public ResponseEntity<ItemDto> updateItem(@RequestHeader(RequestHeaders.USER_ID) long userId,
+											  @PathVariable long itemId,
+											  @RequestBody @Validated(Update.class) ItemDto itemDto) {
 		log.info("Updating item {} by user {}", itemId, userId);
 		return itemClient.updateItem(userId, itemId, itemDto);
 	}
 
 	@GetMapping("/{itemId}")
-	public ResponseEntity<Object> getItem(@RequestHeader(RequestHeaders.USER_ID) long userId,
-										  @PathVariable long itemId) {
+	public ResponseEntity<ItemDto> getItem(@RequestHeader(RequestHeaders.USER_ID) long userId,
+										   @PathVariable long itemId) {
 		log.info("Getting item {} for user {}", itemId, userId);
 		return itemClient.getItem(userId, itemId);
 	}
 
 	@GetMapping
-	public ResponseEntity<Object> getItems(@RequestHeader(RequestHeaders.USER_ID) long userId) {
+	public ResponseEntity<ItemDto[]> getItems(@RequestHeader(RequestHeaders.USER_ID) long userId) {
 		log.info("Getting items of owner {}", userId);
 		return itemClient.getItems(userId);
 	}
 
 	@GetMapping("/search")
-	public ResponseEntity<Object> search(@RequestParam String text) {
+	public ResponseEntity<ItemDto[]> search(@RequestParam String text) {
 		log.info("Searching items with text '{}'", text);
 		return itemClient.search(text);
 	}
 
 	@PostMapping("/{itemId}/comment")
-	public ResponseEntity<Object> addComment(@RequestHeader(RequestHeaders.USER_ID) long userId,
-											 @PathVariable long itemId,
-											 @RequestBody @Valid CommentDto commentDto) {
+	public ResponseEntity<CommentDto> addComment(@RequestHeader(RequestHeaders.USER_ID) long userId,
+												 @PathVariable long itemId,
+												 @RequestBody @Valid CommentDto commentDto) {
 		log.info("Adding comment to item {} by user {}", itemId, userId);
 		return itemClient.addComment(userId, itemId, commentDto);
 	}

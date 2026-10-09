@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import ru.practicum.shareit.booking.dto.BookItemRequestDto;
+import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingState;
 import ru.practicum.shareit.utils.http.RequestHeaders;
 
@@ -26,30 +27,30 @@ public class BookingController {
 	private final BookingClient bookingClient;
 
 	@PostMapping
-	public ResponseEntity<Object> bookItem(@RequestHeader(RequestHeaders.USER_ID) long userId,
-										   @RequestBody @Valid BookItemRequestDto requestDto) {
+	public ResponseEntity<BookingDto> bookItem(@RequestHeader(RequestHeaders.USER_ID) long userId,
+											   @RequestBody @Valid BookItemRequestDto requestDto) {
 		log.info("Creating booking {}, userId={}", requestDto, userId);
 		return bookingClient.bookItem(userId, requestDto);
 	}
 
 	@PatchMapping("/{bookingId}")
-	public ResponseEntity<Object> approve(@RequestHeader(RequestHeaders.USER_ID) long userId,
-										  @PathVariable long bookingId,
-										  @RequestParam boolean approved) {
+	public ResponseEntity<BookingDto> approve(@RequestHeader(RequestHeaders.USER_ID) long userId,
+											  @PathVariable long bookingId,
+											  @RequestParam boolean approved) {
 		log.info("User {} sets approval={} for booking {}", userId, approved, bookingId);
 		return bookingClient.approve(userId, bookingId, approved);
 	}
 
 	@GetMapping("/{bookingId}")
-	public ResponseEntity<Object> getBooking(@RequestHeader(RequestHeaders.USER_ID) long userId,
-											 @PathVariable Long bookingId) {
+	public ResponseEntity<BookingDto> getBooking(@RequestHeader(RequestHeaders.USER_ID) long userId,
+												 @PathVariable Long bookingId) {
 		log.info("Get booking {}, userId={}", bookingId, userId);
 		return bookingClient.getBooking(userId, bookingId);
 	}
 
 	@GetMapping
-	public ResponseEntity<Object> getBookings(@RequestHeader(RequestHeaders.USER_ID) long userId,
-											  @RequestParam(name = "state", defaultValue = "all") String stateParam) {
+	public ResponseEntity<BookingDto[]> getBookings(@RequestHeader(RequestHeaders.USER_ID) long userId,
+													@RequestParam(name = "state", defaultValue = "all") String stateParam) {
 		BookingState state = BookingState.from(stateParam)
 				.orElseThrow(() -> new IllegalArgumentException("Unknown state: " + stateParam));
 		log.info("Get bookings with state {}, userId={}", stateParam, userId);
@@ -57,8 +58,8 @@ public class BookingController {
 	}
 
 	@GetMapping("/owner")
-	public ResponseEntity<Object> getBookingsByOwner(@RequestHeader(RequestHeaders.USER_ID) long userId,
-													 @RequestParam(name = "state", defaultValue = "all") String stateParam) {
+	public ResponseEntity<BookingDto[]> getBookingsByOwner(@RequestHeader(RequestHeaders.USER_ID) long userId,
+														   @RequestParam(name = "state", defaultValue = "all") String stateParam) {
 		BookingState state = BookingState.from(stateParam)
 				.orElseThrow(() -> new IllegalArgumentException("Unknown state: " + stateParam));
 		log.info("Get bookings of items owned by user {} with state {}", userId, stateParam);

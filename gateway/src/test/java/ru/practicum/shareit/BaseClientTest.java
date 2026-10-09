@@ -47,7 +47,7 @@ class BaseClientTest {
 						.contentType(MediaType.APPLICATION_JSON)
 						.body(body));
 
-		ResponseEntity<Object> response = client.get("/users");
+		ResponseEntity<Object> response = client.get("/users", Object.class);
 
 		assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
 		assertEquals(MediaType.APPLICATION_JSON, response.getHeaders().getContentType());
@@ -62,7 +62,7 @@ class BaseClientTest {
 				.andExpect(method(HttpMethod.GET))
 				.andRespond(withSuccess(body, MediaType.APPLICATION_JSON));
 
-		ResponseEntity<Object> response = client.get("/users");
+		ResponseEntity<Object> response = client.get("/users", Object.class);
 
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		server.verify();
@@ -75,7 +75,7 @@ class BaseClientTest {
 				.andExpect(header(USER_ID_HEADER, "1"))
 				.andRespond(withSuccess("[]", MediaType.APPLICATION_JSON));
 
-		client.get("/bookings?state={state}", 1L, Map.of("state", "ALL"));
+		client.get("/bookings?state={state}", 1L, Map.of("state", "ALL"), Object.class);
 
 		server.verify();
 	}
@@ -87,7 +87,7 @@ class BaseClientTest {
 				.andExpect(header(USER_ID_HEADER, "1"))
 				.andRespond(withSuccess("{\"id\":1}", MediaType.APPLICATION_JSON));
 
-		client.get("/users", 1L);
+		client.get("/users", 1L, Object.class);
 
 		server.verify();
 	}
@@ -99,7 +99,7 @@ class BaseClientTest {
 				.andExpect(header(USER_ID_HEADER, "1"))
 				.andRespond(withSuccess("{\"id\":1}", MediaType.APPLICATION_JSON));
 
-		client.post("/items", 1L, Map.of("name", "Drill"));
+		client.post("/items", 1L, Map.of("name", "Drill"), Object.class);
 
 		server.verify();
 	}
@@ -110,7 +110,7 @@ class BaseClientTest {
 				.andExpect(method(HttpMethod.POST))
 				.andRespond(withSuccess("{\"id\":1}", MediaType.APPLICATION_JSON));
 
-		client.post("/items", Map.of("name", "Drill"));
+		client.post("/items", Map.of("name", "Drill"), Object.class);
 
 		server.verify();
 	}
@@ -121,7 +121,7 @@ class BaseClientTest {
 				.andExpect(method(HttpMethod.PUT))
 				.andRespond(withSuccess("{\"id\":1}", MediaType.APPLICATION_JSON));
 
-		client.put("/items/1", 1L, Map.of("name", "Drill"));
+		client.put("/items/1", 1L, Map.of("name", "Drill"), Object.class);
 
 		server.verify();
 	}
@@ -132,7 +132,7 @@ class BaseClientTest {
 				.andExpect(method(HttpMethod.PATCH))
 				.andRespond(withSuccess("{\"id\":1}", MediaType.APPLICATION_JSON));
 
-		client.patch("/items/1", 1L, Map.of("name", "Drill"));
+		client.patch("/items/1", 1L, Map.of("name", "Drill"), Object.class);
 
 		server.verify();
 	}
@@ -143,7 +143,7 @@ class BaseClientTest {
 				.andExpect(method(HttpMethod.PATCH))
 				.andRespond(withSuccess("{\"id\":1}", MediaType.APPLICATION_JSON));
 
-		client.patch("/items/1", Map.of("name", "Drill"));
+		client.patch("/items/1", Map.of("name", "Drill"), Object.class);
 
 		server.verify();
 	}
@@ -155,7 +155,7 @@ class BaseClientTest {
 				.andExpect(header(USER_ID_HEADER, "1"))
 				.andRespond(withSuccess("{\"id\":1}", MediaType.APPLICATION_JSON));
 
-		client.patch("/items/1", 1L);
+		client.patch("/items/1", 1L, Object.class);
 
 		server.verify();
 	}
@@ -166,7 +166,7 @@ class BaseClientTest {
 				.andExpect(method(HttpMethod.DELETE))
 				.andRespond(withSuccess());
 
-		client.delete("/users/1");
+		client.delete("/users/1", Object.class);
 
 		server.verify();
 	}
@@ -178,7 +178,7 @@ class BaseClientTest {
 				.andExpect(header(USER_ID_HEADER, "1"))
 				.andRespond(withSuccess());
 
-		client.delete("/users/1", 1L);
+		client.delete("/users/1", 1L, Object.class);
 
 		server.verify();
 	}

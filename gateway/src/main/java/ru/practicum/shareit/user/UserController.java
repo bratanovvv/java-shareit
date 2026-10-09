@@ -25,32 +25,32 @@ public class UserController {
 	private final UserClient userClient;
 
 	@PostMapping
-	public ResponseEntity<Object> createUser(@RequestBody @Validated(Create.class) UserDto userDto) {
+	public ResponseEntity<UserDto> createUser(@RequestBody @Validated(Create.class) UserDto userDto) {
 		log.info("Creating user {}", userDto);
 		return userClient.createUser(userDto);
 	}
 
 	@PatchMapping("/{userId}")
-	public ResponseEntity<Object> updateUser(@PathVariable long userId,
-											 @RequestBody @Validated(Update.class) UserDto userDto) {
+	public ResponseEntity<UserDto> updateUser(@PathVariable long userId,
+											  @RequestBody @Validated(Update.class) UserDto userDto) {
 		log.info("Updating user {}", userId);
 		return userClient.updateUser(userId, userDto);
 	}
 
 	@GetMapping("/{userId}")
-	public ResponseEntity<Object> getUser(@PathVariable long userId) {
+	public ResponseEntity<UserDto> getUser(@PathVariable long userId) {
 		log.info("Getting user {}", userId);
 		return userClient.getUser(userId);
 	}
 
 	@GetMapping
-	public ResponseEntity<Object> getUsers() {
+	public ResponseEntity<UserDto[]> getUsers() {
 		log.info("Getting all users");
 		return userClient.getUsers();
 	}
 
 	@DeleteMapping("/{userId}")
-	public ResponseEntity<Object> deleteUser(@PathVariable long userId) {
+	public ResponseEntity<Void> deleteUser(@PathVariable long userId) {
 		log.info("Deleting user {}", userId);
 		return userClient.deleteUser(userId);
 	}

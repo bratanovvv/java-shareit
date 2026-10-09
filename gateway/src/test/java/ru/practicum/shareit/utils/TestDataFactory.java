@@ -18,15 +18,15 @@ public final class TestDataFactory {
 	}
 
 	public static ItemDto itemDto(Long id, String name, String description, Boolean available, Long requestId) {
-		return new ItemDto(id, name, description, available, requestId);
+		return new ItemDto(id, name, description, available, requestId, null, null, null);
 	}
 
 	public static CommentDto commentDto(String text) {
-		return new CommentDto(text);
+		return new CommentDto(null, text, null, null);
 	}
 
 	public static ItemRequestDto itemRequestDto(String description) {
-		return new ItemRequestDto(description);
+		return new ItemRequestDto(null, description, null, null);
 	}
 
 	public static BookItemRequestDto bookItemRequestDto(Long itemId, LocalDateTime start, LocalDateTime end) {

@@ -1,11 +1,14 @@
 package ru.practicum.shareit.item.dto;
 
+import java.util.List;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import ru.practicum.shareit.booking.dto.BookingInfoDto;
 import ru.practicum.shareit.utils.validation.group.Create;
 
 @Getter
@@ -26,4 +29,10 @@ public class ItemDto {
 	private Boolean available;
 
 	private Long requestId;
+
+	private BookingInfoDto lastBooking;
+
+	private BookingInfoDto nextBooking;
+
+	private List<CommentDto> comments;
 }

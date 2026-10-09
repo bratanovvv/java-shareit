@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.shareit.BaseClient;
@@ -18,38 +17,43 @@ public class ItemClient extends BaseClient {
 
 	private static final String API_PREFIX = "/items";
 
+	private static final String BY_ID = "/%d";
+
+	private static final String COMMENT = "/%d/comment";
+
+	private static final String SEARCH = "/search?text={text}";
+
 	@Autowired
 	public ItemClient(@Value("${shareit-server.url}") String serverUrl, RestTemplateBuilder builder) {
 		super(
 				builder
 						.uriTemplateHandler(new DefaultUriBuilderFactory(serverUrl + API_PREFIX))
-						.requestFactory(() -> new HttpComponentsClientHttpRequestFactory())
+						.requestFactory(BaseClient::createRequestFactory)
 						.build()
 		);
 	}
 
-	public ResponseEntity<Object> createItem(long userId, ItemDto itemDto) {
-		return post("", userId, itemDto);
+	public ResponseEntity<ItemDto> createItem(long userId, ItemDto itemDto) {
+		return post("", userId, itemDto, ItemDto.class);
 	}
 
-	public ResponseEntity<Object> updateItem(long userId, long itemId, ItemDto itemDto) {
-		return patch("/" + itemId, userId, itemDto);
+	public ResponseEntity<ItemDto> updateItem(long userId, long itemId, ItemDto itemDto) {
+		return patch(String.format(BY_ID, itemId), userId, itemDto, ItemDto.class);
 	}
 
-	public ResponseEntity<Object> getItem(long userId, long itemId) {
-		return get("/" + itemId, userId);
+	public ResponseEntity<ItemDto> getItem(long userId, long itemId) {
+		return get(String.format(BY_ID, itemId), userId, ItemDto.class);
 	}
 
-	public ResponseEntity<Object> getItems(long userId) {
-		return get("", userId);
+	public ResponseEntity<ItemDto[]> getItems(long userId) {
+		return get("", userId, ItemDto[].class);
 	}
 
-	public ResponseEntity<Object> search(String text) {
-		Map<String, Object> parameters = Map.of("text", text);
-		return get("/search?text={text}", null, parameters);
+	public ResponseEntity<ItemDto[]> search(String text) {
+		return get(SEARCH, null, Map.of("text", text), ItemDto[].class);
 	}
 
-	public ResponseEntity<Object> addComment(long userId, long itemId, CommentDto commentDto) {
-		return post("/" + itemId + "/comment", userId, commentDto);
+	public ResponseEntity<CommentDto> addComment(long userId, long itemId, CommentDto commentDto) {
+		return post(String.format(COMMENT, itemId), userId, commentDto, CommentDto.class);
 	}
 }
